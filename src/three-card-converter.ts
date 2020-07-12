@@ -2,9 +2,9 @@ import { CARD_RANKS, DECK } from './constants';
 
 // The structure of this has remained largely unchanged from the original javascript
 // TODO refactor + split up to make more functional
-class ThreeCardConverter {
+export default class ThreeCardConverter {
 
-  fillHand(cards: string[]): string[] {
+  static fillHand(cards: string[]): string[] {
     cards = [...cards];
 
     let cardsUsed = [0,0,0,0,0,0,0,0,0,0,0,0,0];
@@ -41,7 +41,7 @@ class ThreeCardConverter {
     return cards;
   }
 
-  private makesStraight(cardsUsed: number[], rank: number): boolean {
+  private static makesStraight(cardsUsed: number[], rank: number): boolean {
     // Add ace to bottom as well
     let newCards = [cardsUsed[cardsUsed.length - 1]].concat(cardsUsed);
     // Add in new card (pushed up one by ace)
@@ -56,5 +56,3 @@ class ThreeCardConverter {
     });
   }
 }
-
-export = ThreeCardConverter;

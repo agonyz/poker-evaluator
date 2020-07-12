@@ -2,20 +2,15 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { DECK, HAND_TYPES } from './constants';
-import ThreeCardConverter = require('./three-card-converter');
 import { EvaluatedHand } from './types';
+import ThreeCardConverter from './three-card-converter';
+
+// This is outside the class so evalHand is static, to keep same api as @chenosaurus/poker-evaluator
+const RANKS_DATA = fs.readFileSync(path.join(__dirname, '../data/HandRanks.dat'));
 
 export class PokerEvaluator {
-  private ranks: Buffer;
-  private threeCardConverter: ThreeCardConverter;
-
-  constructor() {
-    this.ranks = fs.readFileSync(path.join(__dirname, '../data/HandRanks.dat'));
-    this.threeCardConverter = new ThreeCardConverter();
-  }
-
-  public evalHand(cards: string[]): EvaluatedHand {
-    if (!this.ranks) {
+  public static evalHand(cards: string[]): EvaluatedHand {
+    if (!RANKS_DATA) {
       throw new Error('HandRanks.dat not loaded.');
     }
 
@@ -32,21 +27,21 @@ export class PokerEvaluator {
 
     // If a 3 card hand, fill in to make 5 card
     if (cards.length === 3) {
-      cards = this.threeCardConverter.fillHand(cards);
+      cards = ThreeCardConverter.fillHand(cards);
     }
 
     return this.evaluate(cards);
   }
 
-  private convertInputToLowerCase(cards: string[]): string[] {
+  private static convertInputToLowerCase(cards: string[]): string[] {
     return cards.map(card => card && card.toLowerCase());
   }
 
-  private deckContainsInput(cards: string[]): boolean {
+  private static deckContainsInput(cards: string[]): boolean {
     return cards.every(card => Object.keys(DECK).includes(card));
   }
 
-  private evaluate(cards: string[]): EvaluatedHand {
+  private static evaluate(cards: string[]): EvaluatedHand {
     const cardValues = cards.map(card => DECK[card]);
 
     let p = 53;
@@ -64,7 +59,7 @@ export class PokerEvaluator {
     }
   }
 
-  private evalCard(card: number): number {
-    return this.ranks.readUInt32LE(card * 4);
+  private static evalCard(card: number): number {
+    return RANKS_DATA.readUInt32LE(card * 4);
   }
 }

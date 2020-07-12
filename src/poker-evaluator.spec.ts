@@ -1,34 +1,32 @@
 import { PokerEvaluator } from './poker-evaluator';
 
 describe('PokerEvaluator', () => {
-  const pokerEvaluator = new PokerEvaluator();
-
   describe('throws on invalid input when', () => {
     it('4 cards', () => {
-      expect(() => pokerEvaluator.evalHand(['As', 'Ac', 'Ad', '5s'])).toThrow();
+      expect(() => PokerEvaluator.evalHand(['As', 'Ac', 'Ad', '5s'])).toThrow();
     });
 
     it('8 cards', () => {
-      expect(() => pokerEvaluator.evalHand(['As', 'Ac', 'Ad', '5s', 'Ad', 'Ah', '5c', '5s'])).toThrow();
+      expect(() => PokerEvaluator.evalHand(['As', 'Ac', 'Ad', '5s', 'Ad', 'Ah', '5c', '5s'])).toThrow();
     });
 
     it('non-card strings', () => {
-      expect(() => pokerEvaluator.evalHand(['not', 'valid', 'cards'])).toThrow();
+      expect(() => PokerEvaluator.evalHand(['not', 'valid', 'cards'])).toThrow();
     });
 
     it('includes empty strings', () => {
-      expect(() => pokerEvaluator.evalHand(['', '5d', '8c'])).toThrow();
+      expect(() => PokerEvaluator.evalHand(['', '5d', '8c'])).toThrow();
     });
 
     it('includes undefined', () => {
-      expect(() => pokerEvaluator.evalHand([undefined, 'As', 'Ks'])).toThrow();
+      expect(() => PokerEvaluator.evalHand([undefined, 'As', 'Ks'])).toThrow();
     });
   });
 
   describe('7 cards', () => {
     it('straight flush', () => {
       expect(
-        pokerEvaluator.evalHand(['As', 'Ks', 'Qs', 'Js', 'Ts', '3c', '5h'])
+        PokerEvaluator.evalHand(['As', 'Ks', 'Qs', 'Js', 'Ts', '3c', '5h'])
       ).toEqual({
         handType: 9,
         handRank: 10,
@@ -39,7 +37,7 @@ describe('PokerEvaluator', () => {
 
     it('quads', () => {
       expect(
-        pokerEvaluator.evalHand(['As', 'Ac', 'Ah', 'Ad', '2c', '3c', '4c'])
+        PokerEvaluator.evalHand(['As', 'Ac', 'Ah', 'Ad', '2c', '3c', '4c'])
       ).toEqual({
         handType: 8,
         handRank: 147,
@@ -50,7 +48,7 @@ describe('PokerEvaluator', () => {
 
     it('flush', () => {
       expect(
-        pokerEvaluator.evalHand(['8c', '2c', '3c', 'Tc', 'Jc', '4s', '4d'])
+        PokerEvaluator.evalHand(['8c', '2c', '3c', 'Tc', 'Jc', '4s', '4d'])
       ).toEqual({
         handType: 6,
         handRank: 212,
@@ -61,7 +59,7 @@ describe('PokerEvaluator', () => {
 
     it('straight', () => {
       expect(
-        pokerEvaluator.evalHand(['Ah', '2d', '3c', '4h', '5d', 'Tc', 'Td'])
+        PokerEvaluator.evalHand(['Ah', '2d', '3c', '4h', '5d', 'Tc', 'Td'])
       ).toEqual({
         handType: 5,
         handRank: 1,
@@ -73,7 +71,7 @@ describe('PokerEvaluator', () => {
 
   describe('5 cards', () => {
     it('full house', () => {
-      expect(pokerEvaluator.evalHand(['As', 'Ac', 'Ad', '5d', '5s'])).toEqual({
+      expect(PokerEvaluator.evalHand(['As', 'Ac', 'Ad', '5d', '5s'])).toEqual({
         handType: 7,
         handRank: 148,
         value: 28820,
@@ -82,7 +80,7 @@ describe('PokerEvaluator', () => {
     });
 
     it('invalid hand', () => {
-      expect(pokerEvaluator.evalHand(['2c', '2c', '2c', '2c', '2c'])).toEqual({
+      expect(PokerEvaluator.evalHand(['2c', '2c', '2c', '2c', '2c'])).toEqual({
         handType: 0,
         handRank: 0,
         value: 0,
@@ -93,7 +91,7 @@ describe('PokerEvaluator', () => {
 
   describe('3 cards', () => {
     it('one pair', () => {
-      expect(pokerEvaluator.evalHand(['As', 'Ac', 'Qs'])).toEqual({
+      expect(PokerEvaluator.evalHand(['As', 'Ac', 'Qs'])).toEqual({
         handType: 2,
         handRank: 2761,
         value: 10953,
@@ -102,7 +100,7 @@ describe('PokerEvaluator', () => {
     });
 
     it('trips', () => {
-      expect(pokerEvaluator.evalHand(['Qs', 'Qc', 'Qh'])).toEqual({
+      expect(PokerEvaluator.evalHand(['Qs', 'Qc', 'Qh'])).toEqual({
         handType: 4,
         handRank: 661,
         value: 17045,
@@ -111,7 +109,7 @@ describe('PokerEvaluator', () => {
     });
 
     it('high card', () => {
-      expect(pokerEvaluator.evalHand(['2c', '7d', '9h'])).toEqual({
+      expect(PokerEvaluator.evalHand(['2c', '7d', '9h'])).toEqual({
         handType: 1,
         handRank: 24,
         value: 4120,
