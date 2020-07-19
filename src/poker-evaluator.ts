@@ -40,7 +40,7 @@ export class PokerEvaluator {
     }
   }
 
-  public static evalCard(card: number): number {
+  private static evalCard(card: number): number {
     return RANKS_DATA.readUInt32LE(card * 4);
   }
 
