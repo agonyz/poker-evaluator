@@ -9,41 +9,56 @@ import ThreeCardConverter from './three-card-converter';
 const RANKS_DATA = fs.readFileSync(path.join(__dirname, '../data/HandRanks.dat'));
 
 export class PokerEvaluator {
-  public static evalHand(cards: string[]): EvaluatedHand {
+  public static evalHand(cards: string[] | number[]): EvaluatedHand {
     if (!RANKS_DATA) {
       throw new Error('HandRanks.dat not loaded.');
     }
 
-    if (cards.length !== 7 && cards.length !== 6 && cards.length !== 5 && cards.length !== 3) {
-      throw new Error(`Hand must be 3, 5, 6, or 7 cards, but got ${cards.length}`);
+    if (cards.length !== 7
+     && cards.length !== 6
+     && cards.length !== 5
+     && cards.length !== 3) {
+      throw new Error(`Hand must be 3, 5, 6, or 7 cards, but ${cards.length} cards were provided`);
     }
 
-    cards = this.convertInputToLowerCase(cards);
-    if (!this.deckContainsInput(cards)) {
-      throw new Error(`Please supply input as a valid string[] of "cards".
-        See the keys of src/constants/deck.const.ts for the deck's card values`
-      );
+    if (this.cardsAreValidStrings(cards)) {
+      let stringCards = cards as string[];
+      if (stringCards.length === 3) { // If a 3 card hand, fill in to make 5 card
+        stringCards = ThreeCardConverter.fillHand(stringCards);
+      }
+      return this.evaluate(this.convertCardsToNumbers(stringCards));
+    } else if (this.cardsAreValidNumbers(cards)) {
+      if (cards.length === 3) {
+        throw new Error(`Please supply 3 card hands as string[] of "cards" only.`);
+      }
+      return this.evaluate(cards as number[]);
+    } else {
+      throw new Error(`
+        Please supply input as a valid string[] | number[] of "cards".
+        See src/constants/deck.const.ts for the deck's values
+      `);
     }
-
-    // If a 3 card hand, fill in to make 5 card
-    if (cards.length === 3) {
-      cards = ThreeCardConverter.fillHand(cards);
-    }
-
-    return this.evaluate(cards);
   }
 
-  private static convertInputToLowerCase(cards: string[]): string[] {
-    return cards.map(card => card && card.toLowerCase());
+  public static evalCard(card: number): number {
+    return RANKS_DATA.readUInt32LE(card * 4);
   }
 
-  private static deckContainsInput(cards: string[]): boolean {
-    return cards.every(card => Object.keys(DECK).includes(card));
+  private static convertCardsToNumbers(cards: string[]): number[] {
+    return cards.map(card => DECK[card.toLowerCase()]);
   }
 
-  private static evaluate(cards: string[]): EvaluatedHand {
-    const cardValues = cards.map(card => DECK[card]);
+  private static cardsAreValidStrings(cards: string[] | number[]): boolean {
+    return cards.every((card: string | number) =>
+      typeof card === 'string' && Object.keys(DECK).includes(card.toLowerCase()));
+  }
 
+  private static cardsAreValidNumbers(cards: string[] | number[]): boolean {
+    return cards.every((card: string | number) =>
+      typeof card === 'number' && Object.values(DECK).includes(card));
+  }
+
+  private static evaluate(cardValues: number[]): EvaluatedHand {
     let p = 53;
     cardValues.forEach(cardValue => p = this.evalCard(p + cardValue));
 
@@ -57,9 +72,5 @@ export class PokerEvaluator {
       value: p,
       handName: HAND_TYPES[p >> 12]
     }
-  }
-
-  private static evalCard(card: number): number {
-    return RANKS_DATA.readUInt32LE(card * 4);
   }
 }

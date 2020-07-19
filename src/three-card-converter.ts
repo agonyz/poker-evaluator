@@ -1,9 +1,9 @@
 import { CARD_RANKS, DECK } from './constants';
 
-// The structure of this has remained largely unchanged from the original javascript
-// TODO refactor + split up to make more functional
+// TODO update to allow number input
 export default class ThreeCardConverter {
 
+  // TODO refactor + extract to private functions
   static fillHand(cards: string[]): string[] {
     cards = [...cards];
 
