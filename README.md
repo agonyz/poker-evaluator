@@ -58,13 +58,25 @@ pokerEvaluator.evalHand(['As', 'Ac', 'Qs']);
 Alternatively using the original API (less recommended):
 
 ```js
-const PokerEvaluator = require("poker-evaluator");
+const PokerEvaluator = require('poker-evaluator');
 
-PokerEvaluator.evalHand(["As", "Ks", "Qs", "Js", "Ts", "3c", "5h"]);
+PokerEvaluator.evalHand(['As', 'Ks', 'Qs', 'Js', 'Ts', '3c', '5h']);
+//{ handType: 9,
+//  handRank: 10,
+//  value: 36874,
+//  handName: 'straight flush' }
 
-PokerEvaluator.evalHand(["As", "Ac", "Ad", "5d", "5s"]);
+```
 
-PokerEvaluator.evalHand(["As", "Ac", "Qs"]);
+With numbers: 
+```js
+const PokerEvaluator = require('poker-evaluator');
+
+PokerEvaluator.evalHand([17, 22, 27, 32, 33]);
+//{ handType: 5,
+//  handRank: 6,
+//  value: 20486,
+//  handName: 'straight' }
 
 ```
 
