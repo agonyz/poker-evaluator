@@ -55,6 +55,19 @@ pokerEvaluator.evalHand(['As', 'Ac', 'Qs']);
 //  handName: 'one pair' }
 ```
 
+Alternatively using the original API (less recommended):
+
+```js
+const PokerEvaluator = require("poker-evaluator");
+
+PokerEvaluator.evalHand(["As", "Ks", "Qs", "Js", "Ts", "3c", "5h"]);
+
+PokerEvaluator.evalHand(["As", "Ac", "Ad", "5d", "5s"]);
+
+PokerEvaluator.evalHand(["As", "Ac", "Qs"]);
+
+```
+
 The returned object is an `EvaluatedHand` (src/types/evaluated-hand.interface.ts). An explanation of its properties is as follows:  
 ```ts
 handType: number; // Index of the HAND_TYPES array  
