@@ -8,6 +8,11 @@ import ThreeCardConverter from './three-card-converter';
 // This is outside the class so evalHand is static, to keep same api as @chenosaurus/poker-evaluator
 const RANKS_DATA = fs.readFileSync(path.join(__dirname, '../data/HandRanks.dat'));
 
+// Create a wrapper function to keep same api as @chenosaurus/poker-evaluator
+export function evalHand(cards: string[] | number[]) {
+  return PokerEvaluator.evalHand(cards);
+}
+
 export class PokerEvaluator {
   public static evalHand(cards: string[] | number[]): EvaluatedHand {
     if (!RANKS_DATA) {
