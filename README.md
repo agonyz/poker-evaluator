@@ -20,7 +20,7 @@ This can evaluate about 22MM hands per second on a quad-core 2.7GHz Macbook Pro.
 
 ## Usage:
 
-Call the public `evalHand` method on an instance of `PokerEvaluator` with a single argument, an array of 3, 5, 6 or 7 cards as:  
+Call the public `evalHand` method with a single argument, an array of 3, 5, 6 or 7 cards as:  
 - strings in the format 'Xy' where X = rank and y = suit). This is case insensitive so xy or XY (or any other combination) work fine too.  
   - Ranks: A, 1, 2, 3, 4, 5, 6, 7, 8, 9, T, J, Q, K  
   - Suits: c, d, h, s  
