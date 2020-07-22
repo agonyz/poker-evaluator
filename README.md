@@ -29,25 +29,23 @@ Call the public `evalHand` method on an instance of `PokerEvaluator` with a sing
 _See `src/constants/deck.const.ts` for the full deck_
 
 ```ts
-import { PokerEvaluator } from './poker-evaluator-ts';
+import PokerEvaluator = require('./poker-evaluator-ts');
 
-const pokerEvaluator = new PokerEvaluator();
-
-pokerEvaluator.evalHand(['As', 'Ks', 'Qs', 'Js', 'Ts', '3c', '5h']);
+PokerEvaluator.evalHand(['As', 'Ks', 'Qs', 'Js', 'Ts', '3c', '5h']);
 
 //{ handType: 9,
 //  handRank: 10,
 //  value: 36874,
 //  handName: 'straight flush' }
 
-pokerEvaluator.evalHand(['As', 'Ac', 'Ad', '5d', '5s']);
+PokerEvaluator.evalHand(['As', 'Ac', 'Ad', '5d', '5s']);
 
 //{ handType: 7,
 //  handRank: 148,
 //  value: 28820,
 //  handName: 'full house' }
 
-pokerEvaluator.evalHand(['As', 'Ac', 'Qs']);
+PokerEvaluator.evalHand(['As', 'Ac', 'Qs']);
 
 //{ handType: 2,
 //  handRank: 2761,
