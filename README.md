@@ -28,30 +28,37 @@ Call the public `evalHand` method with a single argument, an array of 3, 5, 6 or
 
 _See `src/constants/deck.const.ts` for the full deck_
 
+Typescript:
 ```ts
-import PokerEvaluator = require('./poker-evaluator-ts');
+import * as PokerEvaluator from 'poker-evaluator-ts';
 
 PokerEvaluator.evalHand(['As', 'Ks', 'Qs', 'Js', 'Ts', '3c', '5h']);
-
 //{ handType: 9,
 //  handRank: 10,
 //  value: 36874,
 //  handName: 'straight flush' }
 
-PokerEvaluator.evalHand(['As', 'Ac', 'Ad', '5d', '5s']);
-
-//{ handType: 7,
-//  handRank: 148,
-//  value: 28820,
-//  handName: 'full house' }
-
 PokerEvaluator.evalHand(['As', 'Ac', 'Qs']);
-
 //{ handType: 2,
 //  handRank: 2761,
 //  value: 10953,
 //  handName: 'one pair' }
 ```
+
+Importing in Javascript
+```js
+const PokerEvaluator = require('poker-evaluator');
+```
+
+Passing numbers as arguments (values from deck.const.ts): 
+```js
+PokerEvaluator.evalHand([17, 22, 27, 32, 33]);
+//{ handType: 5,
+//  handRank: 6,
+//  value: 20486,
+//  handName: 'straight' }
+```
+
 
 The returned object is an `EvaluatedHand` (src/types/evaluated-hand.interface.ts). An explanation of its properties is as follows:  
 ```ts
