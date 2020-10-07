@@ -1,4 +1,4 @@
-import { PokerEvaluator } from './poker-evaluator';
+import PokerEvaluator = require('./poker-evaluator');
 
 describe('PokerEvaluator', () => {
   describe('throws on invalid input when', () => {
