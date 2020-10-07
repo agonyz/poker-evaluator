@@ -1,20 +1,20 @@
-# Poker Hand Evaluator (TypeScript)
+# Poker Hand Evaluator
 
-This is a TypeScript port of the JS library written by David Chen https://github.com/chenosaurus/poker-evaluator.
+This is the official repository of the npm module poker-evaluator.
 
-Poker hand evaluator using the Two Plus Two algorithm and lookup table.
+This is a poker hand evaluator using the Two Plus Two algorithm and lookup table.
 The lookup table HandRanks.dat is included in the module.
 
-Capable of evaluating 3, 5, 6 and 7 card hands.  The highest hand possible in a 3 card hand is 3 of a kind (straights & flushes do not apply to 3 cards).
+Capable of evaluating 3, 5, 6 and 7 card hands. The highest hand possible in a 3 card hand is 3 of a kind (straights & flushes do not apply to 3 cards).
 
 This can evaluate about 22MM hands per second on a quad-core 2.7GHz Macbook Pro. Run the speedtest.js file under /test to try it.
 
 ---
 
 ## Installation
-`npm install --save poker-evaluator-ts`  
+`npm install poker-evaluator` 
   OR  
-`yarn add poker-evaluator-ts`
+`yarn add poker-evaluator`
 
 ---
 
@@ -71,8 +71,9 @@ handName: HandName; // Human readable name of the hand
 ---
 
 ## Contributing
-### Installation
-`npm install`
+To contribute create a pull request from your fork to this repository.
 
-### Testing 
-`npm test`
+## Contributors
+[David Chen](https://github.com/chenosaurus) - Wrote original poker-evaluator
+
+[Rory Mcgit](https://github.com/rorymcgit) - Made project typescript friendly
