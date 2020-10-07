@@ -20,7 +20,7 @@ This can evaluate about 22MM hands per second on a quad-core 2.7GHz Macbook Pro.
 
 ## Usage:
 
-Call the public `evalHand` method on an instance of `PokerEvaluator` with a single argument, an array of 3, 5, 6 or 7 cards as:  
+Call the public `evalHand` method with a single argument, an array of 3, 5, 6 or 7 cards as:  
 - strings in the format 'Xy' where X = rank and y = suit). This is case insensitive so xy or XY (or any other combination) work fine too.  
   - Ranks: A, 1, 2, 3, 4, 5, 6, 7, 8, 9, T, J, Q, K  
   - Suits: c, d, h, s  
@@ -28,37 +28,9 @@ Call the public `evalHand` method on an instance of `PokerEvaluator` with a sing
 
 _See `src/constants/deck.const.ts` for the full deck_
 
+Typescript:
 ```ts
-import { PokerEvaluator } from './poker-evaluator-ts';
-
-const pokerEvaluator = new PokerEvaluator();
-
-pokerEvaluator.evalHand(['As', 'Ks', 'Qs', 'Js', 'Ts', '3c', '5h']);
-
-//{ handType: 9,
-//  handRank: 10,
-//  value: 36874,
-//  handName: 'straight flush' }
-
-pokerEvaluator.evalHand(['As', 'Ac', 'Ad', '5d', '5s']);
-
-//{ handType: 7,
-//  handRank: 148,
-//  value: 28820,
-//  handName: 'full house' }
-
-pokerEvaluator.evalHand(['As', 'Ac', 'Qs']);
-
-//{ handType: 2,
-//  handRank: 2761,
-//  value: 10953,
-//  handName: 'one pair' }
-```
-
-Alternatively using the original API (less recommended):
-
-```js
-const PokerEvaluator = require('poker-evaluator');
+import * as PokerEvaluator from 'poker-evaluator-ts';
 
 PokerEvaluator.evalHand(['As', 'Ks', 'Qs', 'Js', 'Ts', '3c', '5h']);
 //{ handType: 9,
@@ -66,19 +38,27 @@ PokerEvaluator.evalHand(['As', 'Ks', 'Qs', 'Js', 'Ts', '3c', '5h']);
 //  value: 36874,
 //  handName: 'straight flush' }
 
+PokerEvaluator.evalHand(['As', 'Ac', 'Qs']);
+//{ handType: 2,
+//  handRank: 2761,
+//  value: 10953,
+//  handName: 'one pair' }
 ```
 
-With numbers: 
+Importing in Javascript
 ```js
 const PokerEvaluator = require('poker-evaluator');
+```
 
+Passing numbers as arguments (values from deck.const.ts): 
+```js
 PokerEvaluator.evalHand([17, 22, 27, 32, 33]);
 //{ handType: 5,
 //  handRank: 6,
 //  value: 20486,
 //  handName: 'straight' }
-
 ```
+
 
 The returned object is an `EvaluatedHand` (src/types/evaluated-hand.interface.ts). An explanation of its properties is as follows:  
 ```ts
