@@ -74,6 +74,10 @@ function evaluate(cardValues: number[]): EvaluatedHand {
 }
 
 export function winningOdds (hand: string[], community: string[], playerCount: number, cycles: number): number {
+  // Above 23 players, we run out of cards in a deck.  23 * 2 + 5 = 51
+  if (playerCount > 23) {
+    throw new Error("You may have at most 23 players.")
+  }
   const startingDeck = deckWithoutSpecifiedCards([...hand, ...community]);
   let wins = 0;
   for (let i = 0 ; i < cycles ; i ++ ) {
