@@ -21,10 +21,18 @@ This can evaluate about 22MM hands per second on a quad-core 2.7GHz Macbook Pro.
 ## Usage:
 
 Call the public `evalHand` method with a single argument, an array of 3, 5, 6 or 7 cards as:  
-- strings in the format 'Xy' where X = rank and y = suit). This is case insensitive so xy or XY (or any other combination) work fine too.  
+- Strings in the format 'Xy' where X = rank and y = suit. This is case insensitive so xy or XY (or any other combination) work fine too.  
   - Ranks: A, 1, 2, 3, 4, 5, 6, 7, 8, 9, T, J, Q, K  
   - Suits: c, d, h, s  
-- numbers corresponding to the values in the [deck](src/constants/deck.const.ts) (currently does not work for 3 card hands)
+- Numbers corresponding to the values in the [deck](src/constants/deck.const.ts) (currently does not work for 3 card hands)
+
+Call the public `winningOdds` method to estimate the odds of winning a hand given your cards.
+Example usage:
+```javascript
+winningOdds(['ah','as'],[],5, 1000) // 0.581
+winningOdds(['ah','as'],['2c','3c','4c','5c'],5, 1000) // 0.03
+winningOdds(['ah','as'],[],2, 1000) // 0.846
+```
 
 _See `src/constants/deck.const.ts` for the full deck_
 
@@ -45,7 +53,7 @@ PokerEvaluator.evalHand(['As', 'Ac', 'Qs']);
 //  handName: 'one pair' }
 ```
 
-Importing in Javascript
+Importing in JavaScript:
 ```js
 const PokerEvaluator = require('poker-evaluator');
 ```
