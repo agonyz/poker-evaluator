@@ -72,3 +72,45 @@ function evaluate(cardValues: number[]): EvaluatedHand {
     handName: HAND_TYPES[p >> 12]
   }
 }
+
+export function winningOdds (hand: string[], community: string[], playerCount: number, cycles: number): number {
+  const startingDeck = deckWithoutSpecifiedCards([...hand, ...community]);
+  let wins = 0;
+  for (let i = 0 ; i < cycles ; i ++ ) {
+    shuffleDeck(startingDeck);
+    let deckPosition = 0;
+    const interimCommunity = [...community];
+
+    const holeCards = [hand];
+    for (let p = 1 ; p < playerCount ; p ++) {
+      holeCards.push([startingDeck[deckPosition++], startingDeck[deckPosition++]]);
+    }
+
+    while (interimCommunity.length < 5) {
+      interimCommunity.push(startingDeck[deckPosition++]);
+    }
+
+    const playerValue = evalHand([...holeCards[0], ...interimCommunity]).value;
+    wins ++;
+
+    for (let p = 1 ; p < playerCount ; p ++) {
+      if (evalHand([...holeCards[p], ...interimCommunity]).value >= playerValue) {
+        wins --;
+        break;
+      }
+    }
+  }
+
+  return wins / cycles;
+}
+
+function deckWithoutSpecifiedCards (cards: string[]): string[] {
+  const providedSet = new Set(cards);
+  return Object.keys(DECK).filter(name => !providedSet.has(name));
+}
+function shuffleDeck (deck: string[]) {
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+}
