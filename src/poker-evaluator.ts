@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { DECK, HAND_TYPES } from './constants';
+import {DECK, DECK_KEYS, DECK_VALUES, HAND_TYPES} from './constants';
 import { EvaluatedHand } from './types';
 import ThreeCardConverter from './three-card-converter';
 
@@ -39,7 +39,7 @@ export function evalHand(cards: string[] | number[]): EvaluatedHand {
   }
 }
 
-function evalCard(card: number): number {
+export function evalCard(card: number): number {
   return RANKS_DATA.readUInt32LE(card * 4);
 }
 
@@ -49,12 +49,12 @@ function convertCardsToNumbers(cards: string[]): number[] {
 
 function cardsAreValidStrings(cards: string[] | number[]): boolean {
   return cards.every((card: string | number) =>
-    typeof card === 'string' && Object.keys(DECK).includes(card.toLowerCase()));
+    typeof card === 'string' && DECK_KEYS.has(card.toLowerCase()));
 }
 
 function cardsAreValidNumbers(cards: string[] | number[]): boolean {
   return cards.every((card: string | number) =>
-    typeof card === 'number' && Object.values(DECK).includes(card));
+    typeof card === 'number' && DECK_VALUES.has(card));
 }
 
 function evaluate(cardValues: number[]): EvaluatedHand {
@@ -78,14 +78,17 @@ export function winningOdds (hand: string[], community: string[], playerCount: n
   if (playerCount > 23) {
     throw new Error("You may have at most 23 players.")
   }
-  const startingDeck = deckWithoutSpecifiedCards([...hand, ...community]);
+
+  const numHand = convertCardsToNumbers(hand)
+  const numCommunity = convertCardsToNumbers(community)
+  const startingDeck = deckWithoutSpecifiedCards([...numHand, ...numCommunity]);
   let wins = 0;
   for (let i = 0 ; i < cycles ; i ++ ) {
     shuffleDeck(startingDeck);
     let deckPosition = 0;
-    const interimCommunity = [...community];
+    const interimCommunity = [...numCommunity];
 
-    const holeCards = [hand];
+    const holeCards = [numHand];
     for (let p = 1 ; p < playerCount ; p ++) {
       holeCards.push([startingDeck[deckPosition++], startingDeck[deckPosition++]]);
     }
@@ -108,11 +111,11 @@ export function winningOdds (hand: string[], community: string[], playerCount: n
   return wins / cycles;
 }
 
-function deckWithoutSpecifiedCards (cards: string[]): string[] {
+function deckWithoutSpecifiedCards (cards: number[]): number[] {
   const providedSet = new Set(cards);
-  return Object.keys(DECK).filter(name => !providedSet.has(name));
+  return Object.values(DECK).filter(name => !providedSet.has(name));
 }
-function shuffleDeck (deck: string[]) {
+function shuffleDeck (deck: number[]) {
   for (let i = deck.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [deck[i], deck[j]] = [deck[j], deck[i]];
