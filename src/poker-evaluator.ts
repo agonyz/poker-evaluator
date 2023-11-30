@@ -73,6 +73,21 @@ function evaluate(cardValues: number[]): EvaluatedHand {
   }
 }
 
+/**
+ * This function takes the cards in a players hand as well as the community cards (if any) on the table.
+ * Given the player count at the table and the number of simulation cycles to run, this estimates the odds of winning the hand.
+ * Split pots are not counted as a win, so with a royal flush community hand, every player would have winning odds of 0.0.
+ * The more cycles used, the more precise the number will become.  The time complexity of this function is a factor
+ * of the player count multiplied by the number of cycles.  Hands with fewer cards on the table will take slightly longer.
+ *
+ * This does not use any tables, mathematical functions, or other heuristics.  It simply uses a Monte Carlo method.
+ * This means that winning odds will vary with the same cards between runs, even with a very high cycle count.
+ *
+ * Cycles counts of 1000 tend to yield similar results to 100000 however, so unlike a chess engine, there are not
+ * dramatically different qualities of results with longer calculating times.  In cases where the player may be aiming
+ * for something very unlikely, like a straight flush or four of a kind, running 30000 or more cycles will help in getting
+ * odds other than 0, instead yielding the correct ~0.0001.
+ */
 export function winningOdds (hand: string[], community: string[], playerCount: number, cycles: number): number {
   // Above 23 players, we run out of cards in a deck.  23 * 2 + 5 = 51
   if (playerCount > 23) {
@@ -83,13 +98,13 @@ export function winningOdds (hand: string[], community: string[], playerCount: n
   const numCommunity = convertCardsToNumbers(community)
   const startingDeck = deckWithoutSpecifiedCards([...numHand, ...numCommunity]);
   let wins = 0;
-  for (let i = 0 ; i < cycles ; i ++ ) {
+  for (let i = 0; i < cycles; i ++ ) {
     shuffleDeck(startingDeck);
     let deckPosition = 0;
     const interimCommunity = [...numCommunity];
 
     const holeCards = [numHand];
-    for (let p = 1 ; p < playerCount ; p ++) {
+    for (let p = 1; p < playerCount; p ++) {
       holeCards.push([startingDeck[deckPosition++], startingDeck[deckPosition++]]);
     }
 
@@ -98,11 +113,11 @@ export function winningOdds (hand: string[], community: string[], playerCount: n
     }
 
     const playerValue = evalHand([...holeCards[0], ...interimCommunity]).value;
-    wins ++;
+    wins++;
 
-    for (let p = 1 ; p < playerCount ; p ++) {
+    for (let p = 1; p < playerCount; p ++) {
       if (evalHand([...holeCards[p], ...interimCommunity]).value >= playerValue) {
-        wins --;
+        wins--;
         break;
       }
     }
@@ -111,15 +126,21 @@ export function winningOdds (hand: string[], community: string[], playerCount: n
   return wins / cycles;
 }
 
+/**
+ * Given a list of cards already dealt out, return the remaining cards that would be in the deck.
+ */
 function deckWithoutSpecifiedCards (cards: number[]): number[] {
   const providedSet = new Set(cards);
   return Object.values(DECK).filter(name => !providedSet.has(name));
 }
+
+/**
+ * TS implementation of https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm
+ * Code based on: https://stackoverflow.com/a/12646864
+ */
 function shuffleDeck (deck: number[]) {
   for (let i = deck.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [deck[i], deck[j]] = [deck[j], deck[i]];
   }
 }
-
-console.log(winningOdds(['ah','ad'], [], 5, 1000))
