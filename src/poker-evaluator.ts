@@ -19,18 +19,18 @@ export function evalHand(cards: string[] | number[]): EvaluatedHand {
     && cards.length !== 3) {
     throw new Error(`Hand must be 3, 5, 6, or 7 cards, but ${cards.length} cards were provided`);
   }
-
-  if (cardsAreValidStrings(cards)) {
+  if (cardsAreValidNumbers(cards)) {
+    if (cards.length === 3) {
+      throw new Error(`Please supply 3 card hands as string[] of "cards" only.`);
+    }
+    return evaluate(cards as number[]);
+  }
+  else if (cardsAreValidStrings(cards)) {
     let stringCards = cards as string[];
     if (stringCards.length === 3) { // If a 3 card hand, fill in to make 5 card
       stringCards = ThreeCardConverter.fillHand(stringCards);
     }
     return evaluate(convertCardsToNumbers(stringCards));
-  } else if (cardsAreValidNumbers(cards)) {
-    if (cards.length === 3) {
-      throw new Error(`Please supply 3 card hands as string[] of "cards" only.`);
-    }
-    return evaluate(cards as number[]);
   } else {
     throw new Error(`
       Please supply input as a valid string[] | number[] of "cards".
@@ -121,3 +121,5 @@ function shuffleDeck (deck: number[]) {
     [deck[i], deck[j]] = [deck[j], deck[i]];
   }
 }
+
+console.log(winningOdds(['ah','ad'], [], 5, 1000))
