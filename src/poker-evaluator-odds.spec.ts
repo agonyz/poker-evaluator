@@ -1,35 +1,32 @@
 import {winningOdds} from "./poker-evaluator";
 
-const BOUND = 4;
 const DEFAULT_CYCLES = 1000;
 const DEFAULT_PLAYER_COUNT = 5;
 
-/**
- * After extensive testing this function seems to serve as an appropriate upper bound.
- * Math.E seems a better fit than Math.PI but cases were found where it was exceeded.
- *
- * To find a curve for this, the ranges between highest and lowest probability estimate
- * for a certain cycle count were recorded for cycle counts between 0 and 2500.
- *
- * The trend resembled the well-known n/x curve but was softer, so n/sqrt(x) was a better fit.
- * 4 was selected as a "magic number" here since it safely bounded the most extreme ranges
- * found at 100 samples.
- *
- * Certain hands were more "variable" than others, with subsequent tests yielding wider ranges.
- * These tended to occur with strong but not dominant hands with larger player counts.
- *
- * This should fail extremely rarely in tests, if ever.  If it does, consider increasing the magic number.
- * It may be too tolerant of slightly off values as it is tuned to include highly unlikely random events,
- * in order to reduce flakiness.
- * @param cycles
+const TEST_TOLERANCE = 1;
+
+/*
+This models a parabola, the shape that emerged after charting variances for different probabilities.
+The variances that this produces may be overly wide, but it should ensure that this never fails even across countless tests,
+unless the code is actually broken.
  */
-function findVariance(cycles: number):number {
-    return BOUND / Math.sqrt(cycles);
+function expectedVariance(expectedProbability:number): number {
+    const centerProbability = 0.5;
+    const realPeak = 2.2 + TEST_TOLERANCE;
+    const direction = -4.8;
+
+    return direction * Math.pow(expectedProbability - centerProbability, 2) + realPeak;
 }
+
+function findVariance(expectedProbability:number, cycles: number):number {
+    return expectedVariance(expectedProbability) / Math.sqrt(cycles);
+}
+
 function withinRange(expected: number, actual: number, cycles: number): boolean {
-    const variance = findVariance(cycles);
+    const variance = findVariance(expected, cycles);
     const diff = Math.abs(expected - actual);
-    return diff < variance/2;
+    const threshold = diff / (variance / 2);
+    return threshold < 1;
 }
 
 /**
@@ -38,7 +35,79 @@ function withinRange(expected: number, actual: number, cycles: number): boolean 
 describe('PokerEvaluator', () => {
     describe('calculates hole card odds', () => {
         it('pocket aces', () => {
-            expect(withinRange(0.5578, winningOdds(['as','ac'],[], DEFAULT_PLAYER_COUNT, DEFAULT_CYCLES), DEFAULT_CYCLES)).toBeTruthy();
-        })
-    })
+            testHoleCards(['as','ac'], 0.5578);
+        });
+        it('seven deuce', () => {
+            testHoleCards(['2s','7c'], 0.0972);
+        });
+        it('23 suited', () => {
+            testHoleCards(['2c','3c'],0.143)
+        });
+        it('ak suited', () => {
+            testHoleCards(['ac','kc'], 0.3408)
+        });
+        it('pocket jacks', () => {
+            testHoleCards(['js','jc'], 0.3994);
+        });
+    });
+    describe('calculates community and hole card odds', () => {
+        it('low trips high card', () => {
+            testCommunityCards(['2d','ah'],['2h','2c','7c'], 0.7545);
+        });
+        it('low set', () => {
+            testCommunityCards(['2d','2c'],['2h','jd','7c'], 0.846);
+        });
+        it('high set', () => {
+            testCommunityCards(['jh','jc'],['jd','2h','7c'],0.8991);
+        });
+        it('junk', () => {
+            testCommunityCards(['5s','3d'],['2h','tc','7c'], 0.0455);
+        });
+        it('low pair high card', () => {
+            testCommunityCards(['2d','ah'],['2h','tc','7c'], 0.1795);
+        });
+        it('high pair high card', () => {
+            testCommunityCards(['ks','ah'],['ad','tc','7c'],0.5187);
+        });
+        it('open ended straight', () => {
+            testCommunityCards(['9d','8c'],['3h','tc','jd'], 0.2596);
+        });
+        it('gutshot', () => {
+            testCommunityCards(['9d','7c'],['3h','tc','jd'],0.1549);
+        });
+        it('straight', () => {
+            testCommunityCards(['9d','7c'],['8d','tc','jd'],0.5978);
+        });
+        it('low flush', () => {
+            testCommunityCards(['3c','2c'],['jc','tc','qc'],0.6253);
+        });
+        it('nuts flush', () => {
+            testCommunityCards(['ac','2c'],['jc','tc','qc'],0.9136);
+        });
+        it('flush draw', () => {
+            testCommunityCards(['ac','2c'],['9h','tc','qc'],0.3804);
+        });
+        it('straight flush', () => {
+            testCommunityCards(['6c','2c'],['3c','4c','5c'], 1.0);
+        });
+    });
+    describe('turn works', () => {
+        it('gutshot', () => {
+            testCommunityCards(['6d','2c'],['th','qs','5c','3h'],0.0846);
+        });
+    });
+    describe('river works', () => {
+        it('hit low straight', () => {
+            testCommunityCards(['6d','2c'],['th','qs','5c','3h','4d'],0.9173);
+        });
+    });
 })
+
+
+function testHoleCards (cards:string[], expected: number) {
+    expect(withinRange(expected, winningOdds(cards,[], DEFAULT_PLAYER_COUNT, DEFAULT_CYCLES), DEFAULT_CYCLES)).toBeTruthy();
+}
+
+function testCommunityCards(hand: string[], community: string[], expected:number) {
+    expect(withinRange(expected, winningOdds(hand, community, DEFAULT_PLAYER_COUNT, DEFAULT_CYCLES), DEFAULT_CYCLES));
+}
