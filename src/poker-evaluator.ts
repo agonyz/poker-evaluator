@@ -4,6 +4,7 @@ import * as path from 'path';
 import {DECK, DECK_KEYS, DECK_VALUES, HAND_TYPES} from './constants';
 import { EvaluatedHand } from './types';
 import ThreeCardConverter from './three-card-converter';
+import {TableOdds, Split, PlayerOdds} from "./types/odds.interface";
 
 // This is outside the class so evalHand is static, to keep same api as @chenosaurus/poker-evaluator
 const RANKS_DATA = fs.readFileSync(path.join(__dirname, '../data/HandRanks.dat'));
@@ -88,7 +89,7 @@ function evaluate(cardValues: number[]): EvaluatedHand {
  * for something very unlikely, like a straight flush or four of a kind, running 30000 or more cycles will help in getting
  * odds other than 0, instead yielding the correct ~0.0001.
  */
-export function winningOddsForPlayer (hand: string[], community: string[], playerCount: number, cycles: number): object {
+export function winningOddsForPlayer (hand: string[], community: string[], playerCount: number, cycles: number): PlayerOdds {
   // Above 23 players, we run out of cards in a deck.  23 * 2 + 5 = 51
   if (playerCount > 23) {
     throw new Error("You may have at most 23 players.")
@@ -98,7 +99,7 @@ export function winningOddsForPlayer (hand: string[], community: string[], playe
   return winningOddsForTable([hand, ...Array(playerCount - 1).fill([])], community, playerCount, cycles)['players'][0];
 }
 
-export function winningOddsForTable(knownPartialHands: string[][], community: string[], playerCount:number, cycles:number): object {
+export function winningOddsForTable(knownPartialHands: string[][], community: string[], playerCount:number, cycles:number): TableOdds {
   const numCommunity = convertCardsToNumbers(community);
   const numHands = knownPartialHands.map(convertCardsToNumbers);
   const allHoleCards = numHands.reduce((group, currentHand) => [...group, ...currentHand], []);
@@ -135,7 +136,7 @@ export function winningOddsForTable(knownPartialHands: string[][], community: st
     // Find the winning hands this round
     let winningIndexes = [];
     let bestRank = -1;
-    for (let p = 0; p < playerCount; p ++) {
+    for (let p = 0; p < playerCount; p++) {
       if (handValues[p] > bestRank) {
         winningIndexes = [p];
         bestRank = handValues[p];
@@ -156,21 +157,20 @@ export function winningOddsForTable(knownPartialHands: string[][], community: st
   return buildPlayerData(data, cycles);
 }
 
-function buildPlayerData(rawData: object, cycles: number): object {
+function buildPlayerData(rawData: object, cycles: number): TableOdds {
   const playerCount = rawData['wins'].length;
-  const results = {
-    'players':[]
-  }
+  const players = [];
   for (let p = 0; p < playerCount; p++) {
-    const record = {};
-    record['winRate'] = rawData['wins'][p] / cycles;
+
+    const winRate = rawData['wins'][p] / cycles;
+    const splitList = [];
     for (let i = 0; i < rawData['splits'][0].length; i++) {
-      record['split' + (i + 2) + "Rate"] = rawData['splits'][p][i] / cycles;
+      splitList.push({'rate': rawData['splits'][p][i] / cycles, 'ways': i + 2});
     }
-    results['players'].push(record);
+    players.push({'winRate': winRate, 'splitRates': splitList});
   }
 
-  return results;
+  return {'players': players};
 }
 
 /**
@@ -191,3 +191,5 @@ function shuffleDeck (deck: number[]) {
     [deck[i], deck[j]] = [deck[j], deck[i]];
   }
 }
+
+console.log(winningOddsForPlayer(['ah','as'],[],5, 1000))

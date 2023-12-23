@@ -27,14 +27,14 @@ Call the public `evalHand` method with a single argument, an array of 3, 5, 6 or
 - Numbers corresponding to the values in the [deck](src/constants/deck.const.ts) (currently does not work for 3 card hands)
 
 Call the public `winningOddsForPlayer` method to estimate the odds of winning a hand given your cards.
-Example usage:
+This returns a single `PlayerOdds` record.  Example usage:
 ```javascript
-winningOddsForPlayer(['ah','as'],[],5, 1000) // {'winRate':0.56,'split2Rate':0.008,...,'splitNRate':...}
+winningOddsForPlayer(['ah','as'],[],5, 1000) // {'winRate':0.56,'splitRates':[{'rate':0.006, 'ways':2},...{'rate':...,'ways':n}]}
 winningOddsForPlayer(['ah','as'],['2c','3c','4c','5c'],5, 1000) // {'winRate':0.03...}
 winningOddsForPlayer(['ah','as'],[],2, 1000) // {'winRate':0.85,...}
 ```
 Call the public `winningHandsForTable` method to get spectator odds for each players hand.
-Example usage:
+This returns a `TableOdds` record.  Example usage:
 ```javascript
 winningOddsForTable([['ah','as'],['kd','kh']], [], 2, 1000) // {'players':[{'winRate'...},...]}
 ```
@@ -42,6 +42,8 @@ This can be called with partial hands, such as:
 ```javascript
 winningOddsForTable([['ah','as'],['kd'],[]], [], 3, 1000)
 ```
+
+See [odds types](src/types/odds.interface.ts) for the structure of odds.
 
 _See `src/constants/deck.const.ts` for the full deck_
 
