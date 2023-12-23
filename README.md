@@ -26,12 +26,21 @@ Call the public `evalHand` method with a single argument, an array of 3, 5, 6 or
   - Suits: c, d, h, s  
 - Numbers corresponding to the values in the [deck](src/constants/deck.const.ts) (currently does not work for 3 card hands)
 
-Call the public `winningOdds` method to estimate the odds of winning a hand given your cards.
+Call the public `winningOddsForPlayer` method to estimate the odds of winning a hand given your cards.
 Example usage:
 ```javascript
-winningOdds(['ah','as'],[],5, 1000) // 0.581
-winningOdds(['ah','as'],['2c','3c','4c','5c'],5, 1000) // 0.03
-winningOdds(['ah','as'],[],2, 1000) // 0.846
+winningOddsForPlayer(['ah','as'],[],5, 1000) // {'winRate':0.56,'split2Rate':0.008,...,'splitNRate':...}
+winningOddsForPlayer(['ah','as'],['2c','3c','4c','5c'],5, 1000) // {'winRate':0.03...}
+winningOddsForPlayer(['ah','as'],[],2, 1000) // {'winRate':0.85,...}
+```
+Call the public `winningHandsForTable` method to get spectator odds for each players hand.
+Example usage:
+```javascript
+winningOddsForTable([['ah','as'],['kd','kh']], [], 2, 1000) // {'players':[{'winRate'...},...]}
+```
+This can be called with partial hands, such as:
+```javascript
+winningOddsForTable([['ah','as'],['kd'],[]], [], 3, 1000)
 ```
 
 _See `src/constants/deck.const.ts` for the full deck_
@@ -85,3 +94,5 @@ To contribute create a pull request from your fork to this repository.
 [David Chen](https://github.com/chenosaurus) - Wrote original poker-evaluator
 
 [Rory Mcgit](https://github.com/rorymcgit) - Made project typescript friendly
+
+[Aaron Segal](https://github.com/asegs) - Added odds calculator

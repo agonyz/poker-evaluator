@@ -95,7 +95,7 @@ export function winningOddsForPlayer (hand: string[], community: string[], playe
   }
 
   // Hand with no knowledge of other players hands
-  return winningOddsForTable([hand, ...Array(playerCount - 1).fill([])], community, playerCount, cycles);
+  return winningOddsForTable([hand, ...Array(playerCount - 1).fill([])], community, playerCount, cycles)['players'][0];
 }
 
 export function winningOddsForTable(knownPartialHands: string[][], community: string[], playerCount:number, cycles:number): object {
@@ -191,4 +191,6 @@ function shuffleDeck (deck: number[]) {
     [deck[i], deck[j]] = [deck[j], deck[i]];
   }
 }
+
+console.log(winningOddsForTable([['ah','as'],['kd','kh']], [], 2, 1000))
 
