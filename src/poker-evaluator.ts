@@ -88,42 +88,89 @@ function evaluate(cardValues: number[]): EvaluatedHand {
  * for something very unlikely, like a straight flush or four of a kind, running 30000 or more cycles will help in getting
  * odds other than 0, instead yielding the correct ~0.0001.
  */
-export function winningOdds (hand: string[], community: string[], playerCount: number, cycles: number): number {
+export function winningOddsForPlayer (hand: string[], community: string[], playerCount: number, cycles: number): object {
   // Above 23 players, we run out of cards in a deck.  23 * 2 + 5 = 51
   if (playerCount > 23) {
     throw new Error("You may have at most 23 players.")
   }
 
-  const numHand = convertCardsToNumbers(hand)
-  const numCommunity = convertCardsToNumbers(community)
-  const startingDeck = deckWithoutSpecifiedCards([...numHand, ...numCommunity]);
-  let wins = 0;
-  for (let i = 0; i < cycles; i ++ ) {
+  // Hand with no knowledge of other players hands
+  return winningOddsForTable([hand, ...Array(playerCount - 1).fill([])], community, playerCount, cycles);
+}
+
+export function winningOddsForTable(knownPartialHands: string[][], community: string[], playerCount:number, cycles:number): object {
+  const numCommunity = convertCardsToNumbers(community);
+  const numHands = knownPartialHands.map(convertCardsToNumbers);
+  const allHoleCards = numHands.reduce((group, currentHand) => [...group, ...currentHand], []);
+  const startingDeck = deckWithoutSpecifiedCards([...numCommunity, ...allHoleCards]);
+  const startingSplits = [];
+  for (let i = 0; i < playerCount; i++) {
+    startingSplits.push(Array(playerCount - 1).fill(0));
+  }
+  const data = {
+    'wins': Array(playerCount).fill(0),
+    'splits': startingSplits
+  };
+
+  for (let i = 0; i < cycles; i++) {
     shuffleDeck(startingDeck);
     let deckPosition = 0;
     const interimCommunity = [...numCommunity];
 
-    const holeCards = [numHand];
-    for (let p = 1; p < playerCount; p ++) {
-      holeCards.push([startingDeck[deckPosition++], startingDeck[deckPosition++]]);
+    // Fill in players cards from the deck if not provided
+    const holeCards = [];
+    for (let p = 0; p < playerCount; p++) {
+      const card1= numHands[p].length >= 1 ? numHands[p][0] : startingDeck[deckPosition++];
+      const card2 = numHands[p].length == 2 ? numHands[p][1] : startingDeck[deckPosition++];
+      holeCards.push([card1, card2]);
     }
 
     while (interimCommunity.length < 5) {
       interimCommunity.push(startingDeck[deckPosition++]);
     }
 
-    const playerValue = evalHand([...holeCards[0], ...interimCommunity]).value;
-    wins++;
+    // Calculate the ranks of each hand
+    const handValues = holeCards.map(hand => evalHand([...hand, ...interimCommunity]).value);
 
-    for (let p = 1; p < playerCount; p ++) {
-      if (evalHand([...holeCards[p], ...interimCommunity]).value >= playerValue) {
-        wins--;
-        break;
+    // Find the winning hands this round
+    let winningIndexes = [];
+    let bestRank = -1;
+    for (let p = 0; p < playerCount; p ++) {
+      if (handValues[p] > bestRank) {
+        winningIndexes = [p];
+        bestRank = handValues[p];
+      } else if (handValues[p] === bestRank) {
+        winningIndexes.push(p);
       }
     }
+
+    if (winningIndexes.length > 1) {
+      for (let i = 0; i < winningIndexes.length; i++) {
+        // Increment that players split count of this size
+        data['splits'][winningIndexes[i]][winningIndexes.length - 2] += 1;
+      }
+    } else {
+      data['wins'][winningIndexes[0]] += 1;
+    }
+  }
+  return buildPlayerData(data, cycles);
+}
+
+function buildPlayerData(rawData: object, cycles: number): object {
+  const playerCount = rawData['wins'].length;
+  const results = {
+    'players':[]
+  }
+  for (let p = 0; p < playerCount; p++) {
+    const record = {};
+    record['winRate'] = rawData['wins'][p] / cycles;
+    for (let i = 0; i < rawData['splits'][0].length; i++) {
+      record['split' + (i + 2) + "Rate"] = rawData['splits'][p][i] / cycles;
+    }
+    results['players'].push(record);
   }
 
-  return wins / cycles;
+  return results;
 }
 
 /**
@@ -144,3 +191,4 @@ function shuffleDeck (deck: number[]) {
     [deck[i], deck[j]] = [deck[j], deck[i]];
   }
 }
+

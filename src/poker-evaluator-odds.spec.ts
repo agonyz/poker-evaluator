@@ -1,4 +1,4 @@
-import {winningOdds} from "./poker-evaluator";
+import {winningOddsForPlayer} from "./poker-evaluator";
 
 const DEFAULT_CYCLES = 1000;
 const DEFAULT_PLAYER_COUNT = 5;
@@ -105,9 +105,9 @@ describe('PokerEvaluator', () => {
 
 
 function testHoleCards (cards:string[], expected: number) {
-    expect(withinRange(expected, winningOdds(cards,[], DEFAULT_PLAYER_COUNT, DEFAULT_CYCLES), DEFAULT_CYCLES)).toBeTruthy();
+    expect(withinRange(expected, winningOddsForPlayer(cards,[], DEFAULT_PLAYER_COUNT, DEFAULT_CYCLES)['players'][0]['winRate'], DEFAULT_CYCLES)).toBeTruthy();
 }
 
 function testCommunityCards(hand: string[], community: string[], expected:number) {
-    expect(withinRange(expected, winningOdds(hand, community, DEFAULT_PLAYER_COUNT, DEFAULT_CYCLES), DEFAULT_CYCLES));
+    expect(withinRange(expected, winningOddsForPlayer(hand, community, DEFAULT_PLAYER_COUNT, DEFAULT_CYCLES)['players'][0]['winRate'], DEFAULT_CYCLES));
 }
