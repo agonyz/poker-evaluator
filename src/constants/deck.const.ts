@@ -54,3 +54,5 @@ export const DECK: Deck = {
   'ah': 51,
   'as': 52
 }
+export const DECK_KEYS = new Set(Object.keys(DECK))
+export const DECK_VALUES = new Set(Object.values(DECK))
