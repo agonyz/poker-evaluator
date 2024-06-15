@@ -105,9 +105,9 @@ describe('PokerEvaluator', () => {
 
 
 function testHoleCards (cards:string[], expected: number) {
-    expect(withinRange(expected, winningOddsForPlayer(cards,[], DEFAULT_PLAYER_COUNT, DEFAULT_CYCLES)['players'][0]['winRate'], DEFAULT_CYCLES)).toBeTruthy();
+    expect(withinRange(expected, winningOddsForPlayer(cards,[], DEFAULT_PLAYER_COUNT, DEFAULT_CYCLES)['winRate'], DEFAULT_CYCLES)).toBeTruthy();
 }
 
 function testCommunityCards(hand: string[], community: string[], expected:number) {
-    expect(withinRange(expected, winningOddsForPlayer(hand, community, DEFAULT_PLAYER_COUNT, DEFAULT_CYCLES)['players'][0]['winRate'], DEFAULT_CYCLES));
+    expect(withinRange(expected, winningOddsForPlayer(hand, community, DEFAULT_PLAYER_COUNT, DEFAULT_CYCLES)['winRate'], DEFAULT_CYCLES));
 }
