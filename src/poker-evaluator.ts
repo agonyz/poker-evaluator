@@ -191,5 +191,3 @@ function shuffleDeck (deck: number[]) {
     [deck[i], deck[j]] = [deck[j], deck[i]];
   }
 }
-
-console.log(winningOddsForPlayer(['ah','as'],[],5, 1000))
